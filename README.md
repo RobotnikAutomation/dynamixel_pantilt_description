@@ -1,6 +1,6 @@
 # dynamixel_pantilt_description
 
-This package intents to use two dynamixel motors as pantilt. It contains the URDF and launch file example.
+This package uses two dynamixel motors as pantilt. It contains the URDF and launch file example.
 
 ## Installation
 
@@ -46,7 +46,7 @@ Launch the pan tilt
 roslaunch dynamixel_pantilt_description pantilt_control.launch
 ```
 
-Send command to the pan and tilt:
+Send commands to the pan and tilt:
 
 ```bash
 rostopic pub /robot/dynamixel_pan_controller/command std_msgs/Float64 "data: 0.7"
