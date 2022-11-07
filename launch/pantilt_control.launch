@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="robot_id" default="robot" />
+  <arg name="prefix" default="$(arg robot_id)_" />
+  <arg name="port" default="/dev/ttyUSB0" />
+  <arg name="baud_rate" default="115200" />
+  <arg name="file" default="$(find dynamixel_pantilt_description)/config/dynamixel_info.yaml" />
+  
+  <group ns="$(arg robot_id)">
+
+    <!-- Dynamixel Workbench based hardware driver -->
+    <node pkg="dynamixel_workbench_ros_control" type="dynamixel_controller_manager_node" name="dynamixel_controller_manager_node">
+        <rosparam file="$(find dynamixel_pantilt_description)/config/dynamixel_config.yaml" subst_value="true"/>
+    </node>
+
+    <rosparam command="load" file="$(find dynamixel_pantilt_description)/config/pantilt_control.yaml" subst_value="true"/>
+
+    <node name="pantilt_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="
+        dynamixel_pan_controller
+        dynamixel_tilt_controller
+        joint_state_controller
+    "/>
+
+    <!-- Robot state publisher -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" 
+        respawn="false" output="screen" />
+
+    <!-- Load the URDF into ROS parameter server -->
+    <arg name="urdf_file" default="$(find xacro)/xacro '$(find dynamixel_pantilt_description)/robot/dynamixel_pantilt_std.urdf.xacro' prefix:=$(arg prefix) --inorder" />
+    <param name="robot_description" command="$(arg urdf_file)" />
+
+  </group>
+
+  <!-- Start RVIZ -->
+  <arg name="rviz_config" default="$(find dynamixel_pantilt_description)/rviz/view.rviz"/> 
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" required="true"/>
+
+
+</launch>
